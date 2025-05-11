@@ -17,7 +17,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, NoSuchWindowException, TimeoutException
 import dotenv
 
-dotenv.load_dotenv("/Users/osilkin/Programming/main/random/.env", verbose=True)
+dotenv.load_dotenv()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Download Metropolis parking receipts for a specific month')
@@ -26,6 +26,8 @@ def parse_args():
                       help='Browser to use for automation (default: chrome)')
     parser.add_argument('--force-login', action='store_true', 
                        help='Force manual login even if cookies exist')
+    parser.add_argument('--output-dir', '-o', default='~/Documents/parking-receipts',
+                       help='Root directory to store receipts (default: ~/Documents/parking-receipts)')
     return parser.parse_args()
 
 def setup_driver(browser_type):
@@ -272,8 +274,9 @@ def main():
     args = parse_args()
     target_month = args.month.lower()
     
-    # Create output directory
-    output_dir = os.path.expanduser(f"~/Documents/parking-receipts/{target_month}")
+    # Use the specified output directory
+    base_output_dir = os.path.expanduser(args.output_dir)
+    output_dir = os.path.join(base_output_dir, target_month)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
     # Setup browser for manual login
